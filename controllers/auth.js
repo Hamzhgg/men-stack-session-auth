@@ -34,7 +34,13 @@ router.post('/sign-up', async (req, res) => {
 
   const newUser = await User.create(payload);
   // respond back to the browser
-  res.send(`Thanks for signing up ${newUser.username}`);
+  req.session.user = {
+    username: newUser.username,
+  };
+  
+  req.session.save(() => {
+    res.redirect("/");
+  });
 });
 
 // Sign in
@@ -64,15 +70,16 @@ router.post('/sign-in', async (req, res) => {
     username: user.username,
   };
 
-  res.redirect('/');
+  req.session.save(() => {
+    res.redirect('/');
+  });
 });
 
-// sign out
+// Sign out
 router.get('/sign-out', async (req, res) => {
-    req.session.destroy();
-    
-    res.redirect("/");
+  req.session.destroy(() => {
+    res.redirect('/');
+  });
 });
-
 
 module.exports = router;
