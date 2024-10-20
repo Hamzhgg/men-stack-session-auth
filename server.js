@@ -20,13 +20,24 @@ app.use(methodOverride('_method'));
 // Morgan for logging HTTP requests
 app.use(morgan('dev'));
 
-// ROUTES
+// Puplic ROUTES
 app.get('/', async (req, res) => {
-  res.render('index.ejs');
+  res.render('index.ejs', {user: req.session.user});
 });
 
 app.use('/auth', authController);
 
+//Protected Routes
+app.get("/vip-lounge", (req, res) => {
+    if (req.session.user) {
+      res.send(`Welcome to the party ${req.session.user.username}.`);
+    } else {
+        res.sendStatus(404);
+      // res.send("Sorry, no guests allowed.");
+    }
+  });
+
+  
 app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`The express app is ready on port ${port}!`);
